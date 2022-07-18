@@ -1,0 +1,122 @@
+gs schema
+================================================================
+
+product
+
+==================================================================
+
+CREATE TABLE `gs`.`product` (
+  `product_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(50) NOT NULL,
+  `uom_id` INT NOT NULL,
+  `price_per_unit` DOUBLE NOT NULL,
+  `productcol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`product_id`));
+----------------------------------------------------
+ALTER TABLE `gs`.`product` 
+DROP COLUMN `productcol`;
+-------------------------------------------------------------
+
+ALTER TABLE `gs`.`product` 
+ADD INDEX `uom_id_fk_idx` (`uom_id` ASC) VISIBLE;
+;
+ALTER TABLE `gs`.`product` 
+ADD CONSTRAINT `uom_id_fk`
+  FOREIGN KEY (`uom_id`)
+  REFERENCES `gs`.`uom` (`uom_id`)
+  ON DELETE NO ACTION
+  ON UPDATE RESTRICT;
+
+--------------------------------------------------
+INSERT INTO `gs`.`product` (`product_id`, `name`, `uom_id`, `price_per_unit`) VALUES ('1', 'toothpaste', '1', '25');
+-------------------------------------------------------
+
+====================================================================
+
+uom
+
+====================================================================
+
+CREATE TABLE `gs`.`uom` (
+  `uom_id` INT NOT NULL AUTO_INCREMENT,
+  `uom_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`uom_id`));
+-----------------------------------------------------------------------
+INSERT INTO `gs`.`uom` (`uom_id`, `uom_name`) VALUES ('1', 'each');
+INSERT INTO `gs`.`uom` (`uom_id`, `uom_name`) VALUES ('2', 'kg');
+
+
+
+==================================================================
+
+orders
+
+========================================================================
+
+CREATE TABLE `gs`.`orders` (
+  `order_id` INT NOT NULL AUTO_INCREMENT,
+  `customer` INT NOT NULL,
+  `order_date` DATETIME NOT NULL,
+  `total` DOUBLE NOT NULL,
+  PRIMARY KEY (`order_id`));
+
+--------------------------------------------------------------
+ALTER TABLE `gs`.`orders` 
+DROP COLUMN `total`;
+
+
+==========================================================================\
+customer
+==============================================================================
+
+CREATE TABLE `gs`.`customer` (
+  `customer_id` INT NOT NULL,
+  `customer_name` VARCHAR(50) NOT NULL,
+  `mobile_no` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`customer_id`));
+
+---------------------------------------------------------
+INSERT INTO `gs`.`customer` (`customer_id`, `customer_name`, `mobile_no`) VALUES ('1', 'Kamal', '9991307072');
+
+
+
+==================================================================
+order_detail
+==================================================================
+CREATE TABLE `gs`.`order_detail` (
+  `order_id` INT NOT NULL,
+  `product_id` INT NOT NULL,
+  `quantity` DOUBLE NOT NULL,
+  `total` DECIMAL NOT NULL,
+  INDEX `order_id_fk_idx` (`order_id` ASC) VISIBLE,
+  INDEX `product_id_fk_idx` (`product_id` ASC) VISIBLE,
+  CONSTRAINT `order_id_fk`
+    FOREIGN KEY (`order_id`)
+    REFERENCES `gs`.`orders` (`order_id`)
+    ON DELETE NO ACTION
+    ON UPDATE RESTRICT,
+  CONSTRAINT `product_id_fk`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `gs`.`product` (`product_id`)
+    ON DELETE NO ACTION
+    ON UPDATE RESTRICT);
+
+
+
+-------------------------------------------------------------
+ALTER TABLE `gs`.`orders` 
+ADD INDEX `cutomer_id_fk_idx` (`customer` ASC) VISIBLE;
+;
+ALTER TABLE `gs`.`orders` 
+ADD CONSTRAINT `cutomer_id_fk`
+  FOREIGN KEY (`customer`)
+  REFERENCES `gs`.`customer` (`customer_id`)
+  ON DELETE NO ACTION
+  ON UPDATE RESTRICT;
+
+-------------------------------------------------------------------------
+
+ALTER TABLE `gs`.`order_detail` 
+DROP COLUMN `price_per_unit`;
+
+
