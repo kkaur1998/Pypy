@@ -1,6 +1,5 @@
 import re
 from urllib import response
-
 from colorama import Cursor
 from connection import get_sql_connection
 
